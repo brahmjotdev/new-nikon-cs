@@ -22,18 +22,24 @@
 .rich-text-editor {
   @apply h-full min-h-0 w-full px-8 py-6 focus:ring-transparent;
   & > * {
-    @apply mx-auto max-w-2xl;
+    @apply mx-auto max-w-2xl m-0 p-0;
   }
   ol {
-    @apply list-decimal;
+    @apply list-decimal space-y-1;
   }
   ul {
-    @apply list-disc flex flex-col gap-0.5;
+    @apply list-disc space-y-1;
   }
   li {
     @apply ml-8;
   }
+  li > p {
+    @apply ml-1;
+  }
   a {
     @apply text-blue-500 underline font-medium;
+  }
+  hr {
+    @apply my-2;
   }
 }
