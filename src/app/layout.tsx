@@ -5,6 +5,9 @@ import "@/styles/globals.css";
 import { AllProviders, ConvexClientProvider } from "@/providers";
 import { getToken } from "@/lib/auth-server";
 
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -40,6 +43,8 @@ export default async function RootLayout({
             {children}
           </ConvexClientProvider>
         </AllProviders>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
