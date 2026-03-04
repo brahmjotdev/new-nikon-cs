@@ -18,7 +18,7 @@ import {
   FormGroup,
   FormLabel,
   FormSubmit,
-  useFormError,
+  useFormAlert,
 } from "@/components/ui/form";
 
 import { useState } from "react";
@@ -54,7 +54,7 @@ export function AgentResetRequestsBlock() {
     schema: setPasswordSchema,
     defaultValues: { newPassword: "" },
   });
-  const { errorMessages } = useFormError(form);
+  const { errorMessages, setFormAlert } = useFormAlert(form);
 
   const pending = requests ?? [];
 
@@ -77,11 +77,7 @@ export function AgentResetRequestsBlock() {
         newPassword: data.newPassword,
       });
       if (error) {
-        form.setError("root", {
-          message:
-            (error as { message?: string })?.message ??
-            "Failed to set password",
-        });
+        setFormAlert(error, "Failed to set password");
         return;
       }
       await resolveAgentPasswordResetRequest({
@@ -90,9 +86,7 @@ export function AgentResetRequestsBlock() {
       setSelectedRequest(null);
       form.reset();
     } catch (e) {
-      form.setError("root", {
-        message: e instanceof Error ? e.message : "Something went wrong",
-      });
+      setFormAlert(e, "Something went wrong");
     }
   };
 

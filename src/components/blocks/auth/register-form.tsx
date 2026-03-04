@@ -21,7 +21,7 @@ import {
   FormField,
   FormSubmit,
   FormError,
-  useFormError,
+  useFormAlert,
 } from "@/components/ui/form";
 import { useForm } from "@/hooks/use-form";
 import { useAuth } from "@/hooks/db/use-auth";
@@ -50,13 +50,9 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 const RegisterFormBlock = () => {
   const form = useForm({
     schema: registerSchema,
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-    },
+    defaultValues: { name: "", email: "", password: "" },
   });
-  const { errorMessages } = useFormError(form);
+  const { errorMessages, setFormAlert } = useFormAlert(form);
   const { registerUser } = useAuth();
   const router = useRouter();
 
@@ -67,25 +63,14 @@ const RegisterFormBlock = () => {
         email: data.email,
         password: data.password,
       });
-
       const { error } = (result ?? {}) as { error?: unknown };
       if (error) {
-        const message =
-          typeof error === "string"
-            ? error
-            : ((error as { message?: string }).message ??
-              "Unable to register. Please try again.");
-        form.setError("root", { message });
+        setFormAlert(error, "Unable to register. Please try again.");
         return;
       }
-
       router.push("/approval-pending");
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Something went wrong while registering.";
-      form.setError("root", { message });
+      setFormAlert(error, "Something went wrong while registering.");
     }
   };
 

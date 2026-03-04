@@ -3,7 +3,7 @@ import { PublicGuard } from "../public-guard";
 
 export default async function RegisterPage() {
   return (
-    <PublicGuard redirectAuthenticatedTo="/approval-pending">
+    <PublicGuard>
       <div className="flex justify-center items-center h-screen">
         <RegisterFormBlock />
       </div>

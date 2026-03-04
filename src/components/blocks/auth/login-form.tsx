@@ -21,7 +21,7 @@ import {
   FormField,
   FormSubmit,
   FormError,
-  useFormError,
+  useFormAlert,
 } from "@/components/ui/form";
 import { useForm } from "@/hooks/use-form";
 import { useAuth } from "@/hooks/db/use-auth";
@@ -33,7 +33,7 @@ import Link from "next/link";
 
 const loginSchema = z.object({
   email: z.email("Enter a valid email address").trim().toLowerCase(),
-  password: z.string().min(8, "Password is required").trim().toLowerCase(),
+  password: z.string().min(8, "Password must be at least 8 characters").trim().toLowerCase(),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -45,41 +45,27 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 const LoginFormBlock = () => {
   const form = useForm({
     schema: loginSchema,
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: { email: "", password: "" },
   });
-  const { errorMessages } = useFormError(form);
-  const router = useRouter();
+  const { errorMessages, setFormAlert } = useFormAlert(form);
   const { loginUser } = useAuth();
+  const router = useRouter();
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
       const result = await loginUser({
         email: data.email,
         password: data.password,
-        callbackURL: "/products",
+        callbackURL: "/notes",
       });
-
       const { error } = (result ?? {}) as { error?: unknown };
       if (error) {
-        const message =
-          typeof error === "string"
-            ? error
-            : ((error as { message?: string }).message ??
-              "Unable to sign in. Please check your credentials.");
-        form.setError("root", { message });
+        setFormAlert(error, "Unable to sign in. Please check your credentials.");
         return;
       }
-
-      router.push("/products");
+      router.push("/notes");
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Something went wrong while signing in.";
-      form.setError("root", { message });
+      setFormAlert(error, "Something went wrong while signing in.");
     }
   };
 

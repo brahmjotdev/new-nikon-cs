@@ -6,7 +6,6 @@ import { getToken } from "@/lib/auth-server";
 // - Checks if a valid Better Auth token exists.
 // - Never performs role or approval checks (handled by layouts + Convex backend).
 const PublicRoutes = [
-  // "/", // there's no public home page because the app is private so people enter url of the app and they are redirected to the login page
   "/login",
   "/register",
   "/approval-pending",
@@ -18,6 +17,11 @@ const PublicRoutes = [
 
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Homepage → redirect to /notes
+  if (pathname === "/") {
+    return NextResponse.redirect(new URL("/notes", request.url));
+  }
 
   const isAuthenticated = await getToken();
 
@@ -36,14 +40,16 @@ export default async function proxy(request: NextRequest) {
   if (
     isPublicRoute &&
     isAuthenticated &&
-    (pathname === "/login" || pathname === "/register")
+    (pathname === "/login" ||
+      pathname === "/register" ||
+      pathname === "/approval-pending")
   ) {
-    return NextResponse.redirect(new URL("/products", request.url));
+    return NextResponse.redirect(new URL("/notes", request.url));
   }
 
   return NextResponse.next();
 }
 export const config = {
-  // Run middleware on all routes except static assets and api routes
-  matcher: ["/((?!.*\\..*|_next|api/auth).+)", "/trpc(.*)"],
+  // Run middleware on all routes except static assets and api routes (include "/" for homepage redirect)
+  matcher: ["/", "/((?!.*\\..*|_next|api/auth).+)", "/trpc(.*)"],
 };

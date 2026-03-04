@@ -3,7 +3,7 @@ import { PublicGuard } from "../public-guard";
 
 export default async function LoginPage() {
   return (
-    <PublicGuard redirectAuthenticatedTo="/products">
+    <PublicGuard>
       <div className="flex justify-center items-center h-screen">
         <LoginFormBlock />
       </div>

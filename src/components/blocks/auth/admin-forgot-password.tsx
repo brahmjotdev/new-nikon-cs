@@ -9,7 +9,7 @@ import {
   FormGroup,
   FormLabel,
   FormSubmit,
-  useFormError,
+  useFormAlert,
 } from "@/components/ui/form";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "@/hooks/use-form";
@@ -24,40 +24,25 @@ type AdminForgotPasswordValues = z.infer<typeof adminForgotPasswordSchema>;
 export const ForgotPasswordAdminBlock = () => {
   const form = useForm({
     schema: adminForgotPasswordSchema,
-    defaultValues: {
-      email: "",
-    },
+    defaultValues: { email: "" },
   });
-  const { errorMessages } = useFormError(form);
+  const { errorMessages, setFormAlert } = useFormAlert(form);
   const { requestPasswordReset } = useAuth();
 
   const onSubmit = async (data: AdminForgotPasswordValues) => {
     try {
-      const result = await requestPasswordReset({
-        email: data.email,
-      });
-
+      const result = await requestPasswordReset({ email: data.email });
       const { error } = (result ?? {}) as { error?: unknown };
       if (error) {
-        const message =
-          typeof error === "string"
-            ? error
-            : ((error as { message?: string }).message ??
-              "Unable to request password reset.");
-        form.setError("root", { message });
+        setFormAlert(error, "Unable to request password reset.");
         return;
       }
-
       form.setError("root", {
         message:
           "If an admin account exists for this email, a reset link has been sent.",
       });
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Something went wrong while requesting a reset.";
-      form.setError("root", { message });
+      setFormAlert(error, "Something went wrong while requesting a reset.");
     }
   };
 

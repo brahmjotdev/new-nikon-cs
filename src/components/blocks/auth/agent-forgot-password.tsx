@@ -9,7 +9,7 @@ import {
   FormGroup,
   FormLabel,
   FormSubmit,
-  useFormError,
+  useFormAlert,
 } from "@/components/ui/form";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "@/hooks/use-form";
@@ -30,11 +30,9 @@ type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
 export const ForgotPasswordAgentBlock = () => {
   const form = useForm({
     schema: forgotPasswordSchema,
-    defaultValues: {
-      username: "",
-    },
+    defaultValues: { username: "" },
   });
-  const { errorMessages } = useFormError(form);
+  const { errorMessages, setFormAlert } = useFormAlert(form);
   const requestAgentPasswordReset = useMutation(
     api.functions.auth.requestAgentPasswordReset,
   );
@@ -47,11 +45,7 @@ export const ForgotPasswordAgentBlock = () => {
           "If an account exists for this username, your admin has been notified. They will reset your password and contact you.",
       });
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Something went wrong. Please try again.";
-      form.setError("root", { message });
+      setFormAlert(error, "Something went wrong. Please try again.");
     }
   };
 

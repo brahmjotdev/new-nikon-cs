@@ -115,7 +115,7 @@ const toolbarButtonIcons = {
 const Toolbar = React.forwardRef<HTMLDivElement, ToolbarProps>(
   ({ className, children, ...props }, ref) => {
     return (
-      <div data-slot="toolbar-wrapper" className="p-8 sticky top-0 bg-background z-10 overflow-scroll">
+      <div data-slot="toolbar-wrapper" className="p-8 sticky top-0 bg-background z-10">
         <div
           ref={ref}
           data-slot="toolbar"

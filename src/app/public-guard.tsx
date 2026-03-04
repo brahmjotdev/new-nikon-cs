@@ -2,13 +2,7 @@ import { fetchAuthQuery, preloadAuthQuery } from "@/lib/auth-server";
 import { api } from "../../convex/_generated/api";
 import { redirect } from "next/navigation";
 
-export async function PublicGuard({
-  children,
-  redirectAuthenticatedTo,
-}: {
-  children: React.ReactNode;
-  redirectAuthenticatedTo?: string;
-}) {
+export async function PublicGuard({ children }: { children: React.ReactNode }) {
   preloadAuthQuery(api.functions.auth.getCurrentUser);
   const user = await fetchAuthQuery(api.functions.auth.getCurrentUser);
 
@@ -26,12 +20,7 @@ export async function PublicGuard({
     if (user.role !== "agent") {
       redirect("/forbidden");
     }
-
-    if (redirectAuthenticatedTo) {
-      redirect(redirectAuthenticatedTo);
-    }
   }
 
   return <>{children}</>;
 }
-

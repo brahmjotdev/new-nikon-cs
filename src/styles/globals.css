@@ -20,7 +20,7 @@
   @apply flex h-full min-h-0 flex-col;
 }
 .rich-text-editor {
-  @apply h-full min-h-0 w-full px-8 py-6 focus:ring-transparent overflow-y-auto;
+  @apply h-full min-h-0 w-full px-8 py-6 focus:ring-transparent;
   & > * {
     @apply mx-auto max-w-2xl;
   }

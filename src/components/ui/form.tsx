@@ -33,6 +33,17 @@ type FormWithErrors = {
   formState: { errors: Record<string, { message?: string } | undefined> };
 };
 
+type FormWithAlert = FormWithErrors & {
+  setError: (name: "root", opts: { message: string }) => void;
+};
+
+function getFormErrorMessage(error: unknown, fallback: string): string {
+  if (typeof error === "string") return error;
+  if (error instanceof Error) return error.message;
+  const msg = (error as { message?: string })?.message;
+  return typeof msg === "string" ? msg : fallback;
+}
+
 function getAllFormErrors(form: FormWithErrors): string[] {
   const { errors } = form.formState;
   const messages: string[] = [];
@@ -67,6 +78,24 @@ function useFormError(form: FormWithErrors): {
   return {
     errorMessages,
   };
+}
+
+/**
+ * Form-level alert: same as useFormError plus a helper to set the root error from an unknown (e.g. API or catch).
+ * Use with <FormError message={errorMessages} /> and setFormAlert(error, fallback) in submit/catch.
+ */
+function useFormAlert(form: FormWithAlert): {
+  errorMessages: string[];
+  setFormAlert: (error: unknown, fallback: string) => void;
+} {
+  const { errorMessages } = useFormError(form);
+  const setFormAlert = React.useCallback(
+    (error: unknown, fallback: string) => {
+      form.setError("root", { message: getFormErrorMessage(error, fallback) });
+    },
+    [form],
+  );
+  return { errorMessages, setFormAlert };
 }
 
 type FormFieldBase<TFieldValues extends FieldValues> = {
@@ -284,4 +313,5 @@ export {
   FormReset,
   FormError,
   useFormError,
+  useFormAlert,
 };

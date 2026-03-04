@@ -10,7 +10,7 @@ import {
   FormGroup,
   FormLabel,
   FormSubmit,
-  useFormError,
+  useFormAlert,
 } from "@/components/ui/form";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "@/hooks/use-form";
@@ -34,12 +34,9 @@ type UpdatePasswordValues = z.infer<typeof updatePasswordSchema>;
 export const UpdatePasswordBlock = () => {
   const form = useForm({
     schema: updatePasswordSchema,
-    defaultValues: {
-      currentPassword: "",
-      newPassword: "",
-    },
+    defaultValues: { currentPassword: "", newPassword: "" },
   });
-  const { errorMessages } = useFormError(form);
+  const { errorMessages, setFormAlert } = useFormAlert(form);
   const { changePassword, markPasswordUpdated } = useAuth();
   const router = useRouter();
 
@@ -49,26 +46,15 @@ export const UpdatePasswordBlock = () => {
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
       });
-
       const { error } = (result ?? {}) as { error?: unknown };
       if (error) {
-        const message =
-          typeof error === "string"
-            ? error
-            : ((error as { message?: string }).message ??
-              "Unable to update password.");
-        form.setError("root", { message });
+        setFormAlert(error, "Unable to update password.");
         return;
       }
-
       await markPasswordUpdated({});
       router.push("/products");
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Something went wrong while updating your password.";
-      form.setError("root", { message });
+      setFormAlert(error, "Something went wrong while updating your password.");
     }
   };
 
